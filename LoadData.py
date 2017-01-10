@@ -1,8 +1,10 @@
 import h5py
 import numpy as np
 from keras.utils import np_utils
+from keras.backend import backend
+import math
 
-def LoadData(filename, FractionTest=.1, MaxEvents=-1, Classification=True):
+def LoadData(filename, FractionTest=.1, MaxEvents=-1, Classification=True, BatchSize=2048):
 
     F = h5py.File(filename,"r")
 
@@ -21,14 +23,19 @@ def LoadData(filename, FractionTest=.1, MaxEvents=-1, Classification=True):
 
     N_Test = int(round(FractionTest*N))
     N_Train = N-N_Test
+
+    if backend() == "tensorflow":
+	# Have to do this to make TensorFlow work
+	N_Test = int(math.floor(FractionTest*N/BatchSize)*BatchSize)
+        N_Train = int(math.floor((N-N_Test)/BatchSize)*BatchSize)
         
     Train_X = X_In[:N_Train]
     Train_Y = Y_In[:N_Train]
     Train_TY = YT_In[:N_Train]
 
-    Test_X = X_In[N_Train:]
-    Test_Y = Y_In[N_Train:]
-    Test_TY = YT_In[N_Train:]
+    Test_X = X_In[N_Train:N_Train+N_Test]
+    Test_Y = Y_In[N_Train:N_Train+N_Test]
+    Test_TY = YT_In[N_Train:N_Train+N_Test]
 
     if Classification:
         Test_Y = np.sum(Test_Y.reshape(N_Test,2,100),axis=2)

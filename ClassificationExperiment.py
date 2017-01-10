@@ -1,7 +1,7 @@
 import sys,os,argparse
 
 execfile("CaloDNN/ClassificationArguments.py")
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, TensorBoard
 
 # Process the ConfigFile
 execfile(ConfigFile)
@@ -33,7 +33,7 @@ if useGenerator:
     print "NInputs is %i" % NInputs
 
 else:
-    (Train_X, Train_Y, Train_YT), (Test_X, Test_Y, Test_YT) = LoadData(InputFile, FractionTest, MaxEvents)
+    (Train_X, Train_Y, Train_YT), (Test_X, Test_Y, Test_YT) = LoadData(InputFile, FractionTest, MaxEvents, BatchSize)
     #(Train_X, Train_Y),(Test_X, Test_Y) = LoadData(InputFile,FractionTest,MaxEvents=MaxEvents)
 
     # Normalize the Data... seems to be critical!
@@ -46,7 +46,7 @@ else:
     print "NSamples is %g" % NSamples
     print "NTestSamples is %g" % NTestSamples
 
-    TXS = Train_X.shape
+    TXS = BatchSize, 20, 20, 25
     NInputs=TXS[1]*TXS[2]*TXS[3]
     print "NInputs is %i" % NInputs
 
@@ -62,6 +62,7 @@ if LoadModel:
     Name=os.path.basename(LoadModel)
     MyModel=ModelWrapper(Name)
     MyModel.InDir=os.path.dirname(LoadModel)
+    MyModel.InDir=LoadModel
     MyModel.Load()
 
 else:
@@ -101,9 +102,10 @@ if Train:
                 pickle_safe=True)
 
     else:
-        print "Training."
-        callbacks=[EarlyStopping(monitor='val_loss', patience=2, verbose=1, mode='min') ]
-        callbacks=[]
+        print "Training. Using TensorBoard."
+        #callbacks=[]
+        callbacks=[EarlyStopping(monitor='loss', patience=2, verbose=1, mode='min'), TensorBoard(log_dir='./TensorBoardLogs', histogram_freq=0, write_graph=True, write_images=False)]
+        #callbacks=[TensorBoard(log_dir='./TensorBoardLogs', histogram_freq=0, write_graph=True, write_images=False)]
 
         MyModel.Train(Train_X, Train_Y, Epochs, BatchSize, Callbacks=callbacks)
         score = MyModel.Model.evaluate(Test_X, Test_Y, batch_size=BatchSize)
@@ -123,6 +125,7 @@ if Analyze:
         Test_X, Test_Y = Test2_gen.next()
 
     from CaloDNN.Analysis import MultiClassificationAnalysis
+    # turn off for now because it breaks TensorFlow somehow
     result=MultiClassificationAnalysis(MyModel,Test_X,Test_Y,BatchSize)
 
 

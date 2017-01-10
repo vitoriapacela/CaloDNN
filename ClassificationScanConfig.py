@@ -15,7 +15,8 @@ Config={
 
     "Sigma":0.,
 
-    "Epochs":100,
+    "Epochs":2,
+    #"Epochs":100,
     "BatchSize":2048,
     
     "LearningRate":0.005,

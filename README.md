@@ -23,3 +23,11 @@ Run an experiment:
 
 Look at the results in `TrainedModels` directory.
 
+# Running a hyperparameter scan
+
+qsub -q gpu_queue -t 0-5 CaloDNN/ScanJob.sh
+
+# Loading a model to check results interactively in python
+
+python -im CaloDNN.ClassificationExperiment --NoTrain --NoAnalysis -L TrainedModels/CaloDNN_32_1
+MyModel.MetaData.keys()
