@@ -7,7 +7,7 @@ import sys,argparse
 Config={
     "GenerationModel":"'Load'",
     "MaxEvents":int(1e5),
-    "FractionTest":0.1,
+    "FractionTest":0.2,
     "NClasses":2,
     
     "M_min":0,
@@ -15,11 +15,7 @@ Config={
 
     "Sigma":0.,
 
-    "Epochs":2,
-    #"Epochs":100,
     "BatchSize":2048,
-    
-    "LearningRate":0.005,
     
     "Decay":0.,
     "Momentum":0.,
@@ -31,12 +27,14 @@ Config={
     "NBins":200,
 
     "loss":"'categorical_crossentropy'",
-    "optimizer":"'rmsprop'"
 
 }
 
-Params={ "Width":[32,64,128,256,512],
-         "Depth":range(1,10),
+Params={ "Epochs":[2,5,10,20,100],
+	 "Width":[32,64,128,256,512],
+         "Depth":range(1,11),
+	 "DropoutRate":[0.1,0.3,0.5,0.7,0.9],
+	 "LearningRate":[0.005,0.01,0.015,0.02],
           }
 
 PS=Permutator(Params)
@@ -57,7 +55,7 @@ print "Picked combination: ",i
 for k in Combos[i]:
     Config[k]=Combos[i][k]
 
-Name="CaloDNN"
+Name="CaloDNN_HyperParamSet_"+str(HyperParamSet)
 
 for MetaData in Params.keys():
     val=str(Config[MetaData]).replace('"',"")

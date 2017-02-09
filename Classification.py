@@ -6,12 +6,13 @@ from keras.layers import  BatchNormalization,Dropout,Flatten
 from keras.models import model_from_json
 
 class Fully3DImageClassification(ModelWrapper):
-    def __init__(self, Name, input_shape, width=0, depth=0, BatchSize=2048, N_classes=100, init=0):
+    def __init__(self, Name, input_shape, hyperparameters, BatchSize=2048, N_classes=100, init=0):
 
         super(Fully3DImageClassification, self).__init__(Name)
 
-        self.width=width
-        self.depth=depth
+        self.width=hyperparameters["width"]
+        self.depth=hyperparameters["depth"]
+        self.dropout_rate=hyperparameters["dropout_rate"]
         self.input_shape=input_shape
         self.N_classes=N_classes
         self.init=init
@@ -20,6 +21,7 @@ class Fully3DImageClassification(ModelWrapper):
         
         self.MetaData.update({ "width":self.width,
                                "depth":self.depth,
+                               "dropout_rate":self.dropout_rate,
                                "input_shape":self.input_shape,
                                "N_classes":self.N_classes,
                                "init":self.init})
@@ -35,7 +37,7 @@ class Fully3DImageClassification(ModelWrapper):
 #            model.add(BatchNormalization())
             model.add(Dense(self.width,init=self.init))
             model.add(Activation('relu'))
-            model.add(Dropout(0.5))
+            model.add(Dropout(self.dropout_rate))
 
         model.add(Dense(self.N_classes, activation='softmax'))
 

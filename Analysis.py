@@ -1,6 +1,7 @@
 # Analysis
 import numpy as np
 from ROOT import TH1F,TCanvas,TF1
+import scipy.interpolate
 
 def ClassificationAnalysis(MyModel,Test_X,Test_Y,BatchSize, SignalClassIndex=5):
     import matplotlib as mpl
@@ -33,6 +34,7 @@ def ClassificationAnalysis(MyModel,Test_X,Test_Y,BatchSize, SignalClassIndex=5):
     plt.legend(loc="lower right")
 
     plt.savefig(MyModel.OutDir+"/ROC.pdf")
+    plt.close()
 
 
 mpColors=["blue","green","red","cyan","magenta","yellow","black","white"]
@@ -41,24 +43,21 @@ def MultiClassificationAnalysis(MyModel,Test_X,Test_Y,BatchSize):
     import matplotlib as mpl
     mpl.use('pdf')
     import sys
-    print "YOLO0"
     sys.stdout.flush()
     import matplotlib.pyplot as plt
 
-    print "YOLO1"
     sys.stdout.flush()
 
     from sklearn.metrics import roc_curve, auc    
 
     print "Prediction Analysis."
-    print "YOLO2"
     sys.stdout.flush()
     result = MyModel.Model.predict(Test_X, batch_size=BatchSize)
-    print "YOLO3"
     sys.stdout.flush()
     
     NClasses=Test_Y.shape[1]
 
+    # ROC curves for electrons and pions
     for ClassIndex in xrange(0,NClasses):
         fpr, tpr, _ = roc_curve(Test_Y[:,ClassIndex], 
                                 result[:,ClassIndex])
@@ -82,6 +81,7 @@ def MultiClassificationAnalysis(MyModel,Test_X,Test_Y,BatchSize):
         
 
     plt.savefig(MyModel.OutDir+"/ROC.pdf")
+    plt.close()
 
     return result
 
@@ -162,6 +162,7 @@ def RegressionAnalysis(ModelH,X_test,y_test,M_min,M_max,BatchSize):
 
     residualHist.Draw()
     c1.Print(ModelH.OutDir+"/Residual_2GFit.pdf")
+    c1.Close()
 
 def ClassificationAnalysis(ModelH,X_test,y_test,y_testT,M_min,M_max,NBins,BatchSize):
     print "Perdiction Analysis."
@@ -237,5 +238,6 @@ def ClassificationAnalysis(ModelH,X_test,y_test,y_testT,M_min,M_max,NBins,BatchS
 
     residualHist.Draw()
     c1.Print(ModelH.OutDir+"/Residual_2GFit.pdf")
+    c1.Close()
     return result,resultClass
 

@@ -28,6 +28,12 @@ def LoadData(filename, FractionTest=.1, MaxEvents=-1, Classification=True, Batch
 	# Have to do this to make TensorFlow work
 	N_Test = int(math.floor(FractionTest*N/BatchSize)*BatchSize)
         N_Train = int(math.floor((N-N_Test)/BatchSize)*BatchSize)
+
+    # need to shuffle X and Y before using (else we'd get just electrons for training or something
+    from random import shuffle
+    combined = list(zip(X_In, Y_In, YT_In))
+    shuffle(combined)
+    X_In[:], Y_In[:], YT_In[:] = zip(*combined)
         
     Train_X = X_In[:N_Train]
     Train_Y = Y_In[:N_Train]
@@ -72,7 +78,7 @@ def LoadDataGen(filename, Classification=True, BatchSize=1024, Skip=0, Max=-1):
 
 if __name__ == '__main__':
 
-    InputFile="/scratch/data-backup/afarbin/LCD/LCD-Electrons-Pi0.h5"
+    InputFile="/u/sciteam/zhang10/Projects/DNNCalorimeter/DLKit/data/LCD/LCD-Electrons-Pi0.h5"
 
 #    F = h5py.File(InputFile,"r")
 
